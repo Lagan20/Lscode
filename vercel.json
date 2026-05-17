@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "static",
+  "functions": {
+    "api/send-email.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}
