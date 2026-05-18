@@ -30,17 +30,19 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Correo del remitente inválido' });
         }
 
-        // Obtener credenciales de variables de entorno (SEGURO - Solo en servidor)
+        // Obtener credenciales de variables de entorno
         const serviceId = process.env.EMAILJS_SERVICE_ID;
         const templateId = process.env.EMAILJS_TEMPLATE_ID;
         const publicKey = process.env.EMAILJS_PUBLIC_KEY;
 
+        console.log('Environment variables check:', {
+            serviceId: !!serviceId,
+            templateId: !!templateId,
+            publicKey: !!publicKey
+        });
+
         if (!serviceId || !templateId || !publicKey) {
-            console.error('Missing environment variables:', {
-                serviceId: !!serviceId,
-                templateId: !!templateId,
-                publicKey: !!publicKey
-            });
+            console.error('Missing environment variables');
             return res.status(500).json({ 
                 error: 'Configuración de correo no disponible en el servidor' 
             });
@@ -59,7 +61,9 @@ export default async function handler(req, res) {
             reply_to: senderEmail
         };
 
-        // Enviar correo a LsCode usando EmailJS API (DESDE EL SERVIDOR - SEGURO)
+        console.log('Sending email to EmailJS API');
+
+        // Enviar correo a LsCode usando EmailJS API
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: {
@@ -68,7 +72,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 service_id: serviceId,
                 template_id: templateId,
-                user_id: publicKey,  // AQUI está el Public Key, pero es SOLO en servidor
+                user_id: publicKey,
                 template_params: templateParams
             })
         });
@@ -78,6 +82,8 @@ export default async function handler(req, res) {
             console.error('EmailJS API error:', response.status, errorText);
             throw new Error('Error enviando correo a LsCode');
         }
+
+        console.log('Email sent successfully to LsCode');
 
         // Enviar confirmación al usuario
         const confirmationParams = {
@@ -97,7 +103,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 service_id: serviceId,
                 template_id: templateId,
-                user_id: publicKey,  // SEGURO - No se expone al frontend
+                user_id: publicKey,
                 template_params: confirmationParams
             })
         });
@@ -105,16 +111,18 @@ export default async function handler(req, res) {
         if (!confirmResponse.ok) {
             const confirmErrorText = await confirmResponse.text();
             console.warn('Advertencia: correo de confirmación no enviado', confirmErrorText);
+        } else {
+            console.log('Confirmation email sent to user');
         }
 
-        // Respuesta exitosa (sin exponer las credenciales)
+        // Respuesta exitosa
         return res.status(200).json({ 
             success: true, 
             message: 'Correo enviado exitosamente' 
         });
 
     } catch (error) {
-        console.error('Error al enviar correo:', error.message);
+        console.error('Error al enviar correo:', error.message, error);
         return res.status(500).json({ 
             error: 'Error al enviar el correo. Intenta de nuevo más tarde.' 
         });
