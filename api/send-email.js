@@ -153,9 +153,15 @@ export default async function handler(request) {
          });
 
     } catch (error) {
-        console.error('Error al enviar correo:', error.message, error);
-        return res.status(500).json({ 
-            error: 'Error al enviar el correo. Intenta de nuevo más tarde.' 
-        });
-    }
-}
+         console.error('Error al enviar correo:', error.message, error);
+         return new Response(JSON.stringify({ 
+             error: 'Error al enviar el correo. Intenta de nuevo más tarde.' 
+         }), {
+             status: 500,
+             headers: {
+                 'Access-Control-Allow-Origin': '*',
+                 'Content-Type': 'application/json',
+             },
+         });
+     }
+ }
