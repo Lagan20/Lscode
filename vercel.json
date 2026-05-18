@@ -1,11 +1,18 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "outputDirectory": ".",
+  "public": true,
   "functions": {
     "api/send-email.js": {
       "memory": 1024,
-      "maxDuration": 30
+      "maxDuration": 30,
+      "runtime": "nodejs18.x"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/send-email",
+      "destination": "/api/send-email.js"
+    }
+  ]
 }

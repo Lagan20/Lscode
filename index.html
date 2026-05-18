@@ -1809,10 +1809,17 @@
                 submitBtn.disabled = true;
 
                 try {
-                    // Para desarrollo local, usar localhost; para producción, usar la URL actual
-                    const apiUrl = window.location.hostname === 'localhost' 
-                        ? 'http://localhost:3000/api/send-email'
-                        : '/api/send-email';
+                    // Determinar la URL del API según el ambiente
+                    let apiUrl = '/api/send-email';
+                    
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        apiUrl = 'http://localhost:3000/api/send-email';
+                    } else {
+                        // En producción, usar la URL de Vercel
+                        apiUrl = 'https://lscodejz-pzstfqtn6-laffiht-quintero-s-projects.vercel.app/api/send-email';
+                    }
+                    
+                    console.log('Enviando solicitud a:', apiUrl);
 
                     const response = await fetch(apiUrl, {
                         method: 'POST',

@@ -1,4 +1,16 @@
 export default async function handler(req, res) {
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+    
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
     // Solo aceptar solicitudes POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido' });
@@ -24,8 +36,13 @@ export default async function handler(req, res) {
         const publicKey = process.env.EMAILJS_PUBLIC_KEY;
 
         if (!serviceId || !templateId || !publicKey) {
+            console.error('Missing environment variables:', {
+                serviceId: !!serviceId,
+                templateId: !!templateId,
+                publicKey: !!publicKey
+            });
             return res.status(500).json({ 
-                error: 'Configuración de correo no disponible' 
+                error: 'Configuración de correo no disponible en el servidor' 
             });
         }
 
@@ -57,6 +74,8 @@ export default async function handler(req, res) {
         });
 
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('EmailJS API error:', response.status, errorText);
             throw new Error('Error enviando correo a LsCode');
         }
 
@@ -84,7 +103,8 @@ export default async function handler(req, res) {
         });
 
         if (!confirmResponse.ok) {
-            console.warn('Advertencia: correo de confirmación no enviado');
+            const confirmErrorText = await confirmResponse.text();
+            console.warn('Advertencia: correo de confirmación no enviado', confirmErrorText);
         }
 
         // Respuesta exitosa (sin exponer las credenciales)
@@ -94,7 +114,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('Error al enviar correo:', error);
+        console.error('Error al enviar correo:', error.message);
         return res.status(500).json({ 
             error: 'Error al enviar el correo. Intenta de nuevo más tarde.' 
         });
