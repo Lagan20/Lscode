@@ -1,0 +1,10 @@
+{
+  "name": "lscode-contact-form",
+  "version": "1.0.0",
+  "description": "Sitio web de LsCode con formulario de contacto",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Build completed'"
+  },
+  "dependencies": {}
+}
