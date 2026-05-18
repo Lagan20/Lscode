@@ -4,6 +4,7 @@
   "public": true,
   "functions": {
     "api/send-email.js": {
+      "runtime": "nodejs24.x",
       "memory": 1024,
       "maxDuration": 30
     }
