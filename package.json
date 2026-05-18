@@ -3,12 +3,13 @@
   "version": "1.0.1",
   "description": "Sitio web de LsCode con formulario de contacto",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "echo 'Build completed'",
     "dev": "echo 'Development mode'"
   },
   "engines": {
-    "node": "24"
+    "node": ">=20.0.0"
   },
   "dependencies": {}
 }

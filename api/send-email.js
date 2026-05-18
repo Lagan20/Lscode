@@ -1,4 +1,5 @@
-export default async function handler(request) {
+export default {
+  async fetch(request) {
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
         return new Response(null, {
@@ -164,4 +165,5 @@ export default async function handler(request) {
              },
          });
      }
- }
+  }
+}
