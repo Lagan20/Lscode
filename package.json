@@ -4,7 +4,11 @@
   "description": "Sitio web de LsCode con formulario de contacto",
   "private": true,
   "scripts": {
-    "build": "echo 'Build completed'"
+    "build": "echo 'Build completed'",
+    "dev": "echo 'Development mode'"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {}
 }
