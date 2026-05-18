@@ -1,6 +1,7 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm install",
+  "outputDirectory": ".",
   "functions": {
     "api/send-email.js": {
       "memory": 1024,
