@@ -1,11 +1,5 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "public": true,
-  "rewrites": [
-    {
-      "source": "/api/send-email",
-      "destination": "/api/send-email.js"
-    }
-  ]
+  "public": true
 }

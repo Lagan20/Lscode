@@ -1,50 +1,53 @@
-export default async function handler(req, res) {
+export default async function handler(request) {
     // Handle CORS preflight
-    if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-        res.status(200).end();
-        return;
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            status: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+        });
     }
 
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
     // Solo aceptar solicitudes POST
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Método no permitido' });
+    if (request.method !== 'POST') {
+        return new Response(JSON.stringify({ error: 'Método no permitido' }), {
+            status: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+            },
+        });
     }
 
     try {
-        let senderName, senderEmail, message, recipientEmail;
-        
-        // Parse request body
-        if (typeof req.body === 'string') {
-            const parsed = JSON.parse(req.body);
-            senderName = parsed.senderName;
-            senderEmail = parsed.senderEmail;
-            message = parsed.message;
-            recipientEmail = parsed.recipientEmail;
-        } else {
-            senderName = req.body?.senderName;
-            senderEmail = req.body?.senderEmail;
-            message = req.body?.message;
-            recipientEmail = req.body?.recipientEmail;
-        }
+        const body = await request.json();
+        const { senderName, senderEmail, message, recipientEmail } = body;
 
         // Validar los campos requeridos
-        if (!senderName || !senderEmail || !message || !recipientEmail) {
-            return res.status(400).json({ error: 'Campos requeridos faltantes' });
-        }
-
-        // Validar el formato del correo
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(senderEmail)) {
-            return res.status(400).json({ error: 'Correo del remitente inválido' });
-        }
+         if (!senderName || !senderEmail || !message || !recipientEmail) {
+             return new Response(JSON.stringify({ error: 'Campos requeridos faltantes' }), {
+                 status: 400,
+                 headers: {
+                     'Access-Control-Allow-Origin': '*',
+                     'Content-Type': 'application/json',
+                 },
+             });
+         }
+ 
+         // Validar el formato del correo
+         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+         if (!emailRegex.test(senderEmail)) {
+             return new Response(JSON.stringify({ error: 'Correo del remitente inválido' }), {
+                 status: 400,
+                 headers: {
+                     'Access-Control-Allow-Origin': '*',
+                     'Content-Type': 'application/json',
+                 },
+             });
+         }
 
         // Obtener credenciales de variables de entorno
         const serviceId = process.env.EMAILJS_SERVICE_ID;
@@ -58,11 +61,17 @@ export default async function handler(req, res) {
         });
 
         if (!serviceId || !templateId || !publicKey) {
-            console.error('Missing environment variables');
-            return res.status(500).json({ 
-                error: 'Configuración de correo no disponible en el servidor' 
-            });
-        }
+             console.error('Missing environment variables');
+             return new Response(JSON.stringify({ 
+                 error: 'Configuración de correo no disponible en el servidor' 
+             }), {
+                 status: 500,
+                 headers: {
+                     'Access-Control-Allow-Origin': '*',
+                     'Content-Type': 'application/json',
+                 },
+             });
+         }
 
         // Crear el asunto personalizado
         const subject = `Buenas Ls/Code, Soy/Somos ${senderName}`;
@@ -131,11 +140,17 @@ export default async function handler(req, res) {
             console.log('Confirmation email sent to user');
         }
 
-        // Respuesta exitosa
-        return res.status(200).json({ 
-            success: true, 
-            message: 'Correo enviado exitosamente' 
-        });
+         // Respuesta exitosa
+         return new Response(JSON.stringify({ 
+             success: true, 
+             message: 'Correo enviado exitosamente' 
+         }), {
+             status: 200,
+             headers: {
+                 'Access-Control-Allow-Origin': '*',
+                 'Content-Type': 'application/json',
+             },
+         });
 
     } catch (error) {
         console.error('Error al enviar correo:', error.message, error);
