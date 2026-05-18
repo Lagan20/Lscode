@@ -1,15 +1,17 @@
 export default async function handler(req, res) {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-    
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.status(200).end();
         return;
     }
+
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Solo aceptar solicitudes POST
     if (req.method !== 'POST') {
@@ -17,7 +19,21 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { senderName, senderEmail, message, recipientEmail } = req.body;
+        let senderName, senderEmail, message, recipientEmail;
+        
+        // Parse request body
+        if (typeof req.body === 'string') {
+            const parsed = JSON.parse(req.body);
+            senderName = parsed.senderName;
+            senderEmail = parsed.senderEmail;
+            message = parsed.message;
+            recipientEmail = parsed.recipientEmail;
+        } else {
+            senderName = req.body?.senderName;
+            senderEmail = req.body?.senderEmail;
+            message = req.body?.message;
+            recipientEmail = req.body?.recipientEmail;
+        }
 
         // Validar los campos requeridos
         if (!senderName || !senderEmail || !message || !recipientEmail) {
