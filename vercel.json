@@ -2,13 +2,6 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "public": true,
-  "functions": {
-    "api/send-email.js": {
-      "runtime": "nodejs@24.x",
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/api/send-email",
