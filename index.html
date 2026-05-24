@@ -1655,7 +1655,7 @@
             <h2 class="section-title">Contáctanos</h2>
             <div class="contact-content">
                 <div class="contact-form">
-                    <h3>Envíanos un correo</h3>
+                    <h3>Envíanos un mensaje por WhatsApp</h3>
                     <form id="contactForm">
                         <div class="form-group">
                             <label for="name">Nombre de la Persona o Empresa</label>
@@ -1669,7 +1669,7 @@
                             <label for="message">Tu Mensaje</label>
                             <textarea id="message" name="message" required></textarea>
                         </div>
-                        <button type="submit" class="form-submit">Enviar correo</button>
+                        <button type="submit" class="form-submit">Enviar mensaje a WhatsApp</button>
                         <div class="form-message" id="formMessage"></div>
                     </form>
                 </div>
@@ -1706,7 +1706,7 @@
     </footer>
 
     <!-- WHATSAPP BUTTON -->
-    <a href="https://wa.me/526672237132?text=Buenas%20LsCode%2C%20me%20interesa%20conocer%20sus%20servicios" target="_blank" class="whatsapp-btn" title="Envíanos un mensaje por WhatsApp">
+    <a href="https://wa.me/526672237132?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20sus%20servicios" target="_blank" class="whatsapp-btn" title="Envíanos un mensaje por WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -1790,90 +1790,50 @@
             });
         });
 
-        // CONTACT FORM
+        // CONTACT FORM - WHATSAPP
         const contactForm = document.getElementById('contactForm');
         const formMessage = document.getElementById('formMessage');
 
-        contactForm.addEventListener('submit', async (e) => {
+        contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const message = document.getElementById('message').value.trim();
 
             if (name && email && message) {
-                // Show loading state
                 const submitBtn = contactForm.querySelector('.form-submit');
                 const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Enviando...';
+                submitBtn.textContent = 'Redirigiendo...';
                 submitBtn.disabled = true;
 
-                try {
-                    // Determinar la URL del API según el ambiente
-                    let apiUrl = '/api/send-email';
-                    
-                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                        apiUrl = 'http://localhost:3000/api/send-email';
-                    } else {
-                        // En producción, usar la URL de Vercel
-                        apiUrl = 'https://lscodejz-pzstfqtn6-laffiht-quintero-s-projects.vercel.app/api/send-email';
-                    }
-                    
-                    console.log('Enviando solicitud a:', apiUrl);
+                const whatsappNumber = '526672237132';
+                const whatsappText = `Hola, Soy /Somos ${name}, puede contactarnos por ${email}, queria comentarle ${message}`;
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
 
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            senderName: name,
-                            senderEmail: email,
-                            message: message,
-                            recipientEmail: 'gaffiht.quintero20@gmail.com'
-                        })
-                    });
+                window.open(whatsappUrl, '_blank');
 
-                    if (response.ok) {
-                        // Show success message
-                        formMessage.textContent = 'Mensaje enviado exitosamente. Nos pondremos en contacto pronto.';
-                        formMessage.classList.add('success');
-                        formMessage.style.display = 'block';
+                formMessage.textContent = 'Serás redirigido a WhatsApp. Si no ocurre, haz clic en el botón flotante.';
+                formMessage.classList.add('success');
+                formMessage.style.display = 'block';
 
-                        // Reset form
-                        contactForm.reset();
+                contactForm.reset();
 
-                        // Hide message after 5 seconds
-                        setTimeout(() => {
-                            formMessage.style.display = 'none';
-                            formMessage.classList.remove('success');
-                        }, 5000);
-                    } else {
-                        // Show error message
-                        formMessage.textContent = 'Error al enviar el mensaje. Intenta de nuevo.';
-                        formMessage.classList.add('error');
-                        formMessage.style.display = 'block';
-                        
-                        setTimeout(() => {
-                            formMessage.style.display = 'none';
-                            formMessage.classList.remove('error');
-                        }, 5000);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    // Show error message
-                    formMessage.textContent = 'Error de conexión. Intenta de nuevo.';
-                    formMessage.classList.add('error');
-                    formMessage.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        formMessage.style.display = 'none';
-                        formMessage.classList.remove('error');
-                    }, 5000);
-                } finally {
+                setTimeout(() => {
+                    formMessage.style.display = 'none';
+                    formMessage.classList.remove('success');
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;
-                }
+                }, 5000);
+            } else {
+                formMessage.textContent = 'Favor de ingresar todos los valores solicitados';
+                formMessage.classList.add('error');
+                formMessage.style.display = 'block';
+
+                setTimeout(() => {
+                    formMessage.style.display = 'none';
+                    formMessage.classList.remove('error');
+                }, 5000);
             }
         });
 
